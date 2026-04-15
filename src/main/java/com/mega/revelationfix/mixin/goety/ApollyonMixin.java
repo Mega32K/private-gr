@@ -214,9 +214,6 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
         ApollyonExpandedContext apollyonEC = revelaionfix$apollyonEC();
         AttackDamageChangeHandler handler0 = apollyonEC.attackDamageReducer;
         this.revelaionfix$setIllusionMode(pCompound.getBoolean("IllusionMode"));
-        if (pCompound.contains("ApollyonHP", 99)) {
-            this.revelaionfix$setApollyonHealth(pCompound.getFloat("ApollyonHP"));
-        }
         if (pCompound.contains("deathPerformance")) {
             DeathPerformance.setLeftTime(apostle, pCompound.getInt("deathPerformance"));
         }
