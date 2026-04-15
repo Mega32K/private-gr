@@ -1,0 +1,140 @@
+package com.mega.revelationfix.safe.entity;
+
+import com.Polarice3.Goety.api.entities.IOwned;
+import com.mega.endinglib.util.mc.entity.armor.ArmorUtils;
+import com.mega.revelationfix.common.compat.SafeClass;
+import com.mega.revelationfix.common.item.armor.ModArmorMaterials;
+import com.mega.revelationfix.util.LivingEntityEC;
+import com.mega.revelationfix.util.entity.ATAHelper2;
+import com.mega.revelationfix.util.entity.EntityActuallyHurt;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySelector;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.WalkAnimationState;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeMap;
+
+import javax.annotation.Nullable;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Predicate;
+
+public class EntityExpandedContext {
+    public static final Predicate<Entity> NO_GODS = (e) -> EntitySelector.NO_CREATIVE_OR_SPECTATOR.test(e) && !ATAHelper2.hasOdamane(e);
+    public static final String GR_MAY_FRIENDLY_TAG = "grFriendlyToTeam";
+    public static final String GR_FT_CHURCH = "grFT_church";
+    public final LivingEntity entity;
+    private final Lock LOCK = new ReentrantLock();
+    public String className;
+    public EntityActuallyHurt.IndexAndType indexAndType;
+    public int apollyonLastGrowingTime;
+    public int banHealingTime;
+    @Nullable
+    public UUID quietusCasterID;
+    public short tetraFadingTime;
+    public int banAnySpelling;
+    public CompoundTag tempNbtForServer;
+    public short usingTempNbtSeconds;
+    public WalkAnimationState customArmorWalkAnimState = new WalkAnimationState();
+    @Nullable
+    private LivingEntity quietusCaster;
+
+    public EntityExpandedContext(LivingEntity entity) {
+        this.entity = entity;
+        this.className = entity.getClass().getName();
+        if (!SafeClass.isFantasyEndingLoaded()) {
+            //this.indexAndType = EntityActuallyHurt.checkAndSave(entity);
+            if (EntityActuallyHurt.entityHealthData.containsKey(this.className))
+                this.indexAndType = EntityActuallyHurt.checkAndSave(entity);
+            else CompletableFuture.runAsync(()-> this.indexAndType = EntityActuallyHurt.checkAndSave(entity));
+        }
+    }
+
+    public static boolean isOwnerFriendlyTag(Entity owned) {
+        return owned instanceof IOwned iOwned && iOwned.getTrueOwner() != null && iOwned.getTrueOwner().getTags().contains(GR_MAY_FRIENDLY_TAG);
+    }
+
+    public static boolean isOwnerFriendlyTag_Church(Entity owned) {
+        return owned instanceof IOwned iOwned && iOwned.getTrueOwner() != null && iOwned.getTrueOwner().getTags().contains(GR_FT_CHURCH);
+    }
+
+    public static EntityActuallyHurt.IndexAndType getIndexAndType(LivingEntity living) {
+        if (living == null) return null;
+        else return ((LivingEntityEC) living).revelationfix$livingECData().indexAndType;
+    }
+
+    /**
+     * xxx = nbt.get
+     *
+     * @param nbt NBT Data
+     */
+    public void read(CompoundTag nbt) {
+        if (nbt.hasUUID("quietusCasterID"))
+            quietusCasterID = nbt.getUUID("quietusCasterID");
+    }
+
+    /**
+     * nbt.put(xxx)
+     *
+     * @param nbt NBT Data
+     */
+    public void save(CompoundTag nbt) {
+        if (quietusCasterID != null) {
+            nbt.putUUID("quietusCasterID", quietusCasterID);
+        }
+    }
+
+    @Nullable
+    public LivingEntity getQuietusCaster() {
+        if (quietusCasterID == null) return null;
+        if (entity.level().isClientSide) return null;
+        else if (entity.level() instanceof ServerLevel serverLevel) {
+            if (serverLevel.getEntities().get(quietusCasterID) instanceof LivingEntity living && quietusCaster == null)
+                quietusCaster = living;
+            return quietusCaster;
+        } else return null;
+    }
+
+    public void setQuietusCaster(LivingEntity living) {
+        this.quietusCaster = living;
+        this.quietusCasterID = living.getUUID();
+    }
+
+    public void tick() {
+        if (SafeClass.isTetraLoaded()) {
+            if (tetraFadingTime > 0) {
+                tetraFadingTime--;
+                if (tetraFadingTime == 0) {
+                    synchronized (entity.getAttributes()) {
+                        for (var entry : SafeClass.getAttributes().object2ObjectEntrySet()) {
+                            AttributeInstance instance = entity.getAttribute(entry.getKey());
+                            if (instance != null) {
+                                instance.removeModifier(entry.getValue());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (entity.tickCount % 20 == 0) {
+            if (usingTempNbtSeconds <= 0)
+                tempNbtForServer = null;
+            else usingTempNbtSeconds--;
+        }
+        if (ArmorUtils.findChestplate(entity, ModArmorMaterials.SPIDER_DARKMAGE)) {
+            if (entity.onClimbable())
+                customArmorWalkAnimState.update(customArmorWalkAnimState.speed() + 0.2F, 0.4F);
+            else {
+                if (customArmorWalkAnimState.speed() > 0F)
+                    customArmorWalkAnimState.update(customArmorWalkAnimState.speed() - 0.2F, 0.4F);
+                else {
+                    customArmorWalkAnimState.setSpeed(0F);
+                }
+            }
+        }
+    }
+}
