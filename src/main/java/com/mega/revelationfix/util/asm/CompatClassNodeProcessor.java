@@ -25,7 +25,6 @@ public class CompatClassNodeProcessor implements IClassProcessor {
             String name = classNode.name;
             if (LIVING_ENTITY_CLASS.equals(name)) {
                 classNode.methods.forEach(eachMethod -> {
-                    //闁搞儳鍋犻、?
                     if (MCMapping.LivingEntity$METHOD$heal.equalsMethodNode(eachMethod)) {
                         InsnList list = new InsnList();
                         list.add(new VarInsnNode(Opcodes.ALOAD, 0));
@@ -34,10 +33,8 @@ public class CompatClassNodeProcessor implements IClassProcessor {
                         list.add(new VarInsnNode(Opcodes.FSTORE, 1));
                         InjectionFinder.injectHead(eachMethod, list);
                         modified.set(true);
-                        //闁烩晜姊婚弫鎶藉礄韫囧孩绺?
                     } else if (MCMapping.LivingEntity$METHOD$getDamageAfterArmorAbsorb.equalsMethodNode(eachMethod)) {
                         eachMethod.instructions.forEach(abstractInsnNode -> {
-                            //闁烩晜姊婚弫鎶藉礄韫囧孩绺洪柡鍌濐潐绾?
                             if (abstractInsnNode instanceof MethodInsnNode mNode && MCMapping.CombatRules$METHOD$getDamageAfterAbsorb.equalsMethodNode(mNode)) {
                                 InsnList list = new InsnList();
                                 list.add(new VarInsnNode(Opcodes.ALOAD, 0));
@@ -50,10 +47,8 @@ public class CompatClassNodeProcessor implements IClassProcessor {
                                 modified.set(true);
                             }
                         });
-                        //闂傚嫬瀚伴悺鐔煎礄韫囧孩绺?
                     } else if (MCMapping.LivingEntity$METHOD$getDamageAfterMagicAbsorb.equalsMethodNode(eachMethod)) {
                         eachMethod.instructions.forEach(abstractInsnNode -> {
-                            //闂傚嫬瀚伴悺鐔煎礄韫囧孩绺洪柡鍌濐潐绾?
                             if (abstractInsnNode instanceof MethodInsnNode mNode && MCMapping.CombatRules$METHOD$getDamageAfterMagicAbsorb.equalsMethodNode(mNode)) {
                                 InsnList list = new InsnList();
                                 list.add(new VarInsnNode(Opcodes.ALOAD, 0));

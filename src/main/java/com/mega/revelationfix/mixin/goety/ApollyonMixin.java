@@ -371,7 +371,7 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
                     PlayerTickrateExecutor.disableBaseValueMode((Player) entity);
                 }
         }
-        //更新死亡时间
+        //闁哄洤鐡ㄩ弻濠傤潰鐠佹娊顎楅柡鍐ㄧ埣濡?
         this.setDeathTime(this.getDeathTime() + 1);
         currentDeathTime = this.getDeathTime();
 
@@ -493,7 +493,7 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
                     this.remove(RemovalReason.KILLED);
                     for (Entity entity : level.getEntities(this, new AABB(blockPosition()).inflate(64D), (e) -> e instanceof Player)) {
                         if (!level.isClientSide) {
-                            //触发成就
+                            //閻熸瑱绠戣ぐ鍌炲箣閹邦剚鐨?
                             ServerPlayer serverPlayer = (ServerPlayer) entity;
                             CriteriaTriggers.PLAYER_KILLED_ENTITY.trigger(serverPlayer, this, serverPlayer.damageSources().playerAttack(serverPlayer));
                             ((PlayerInterface) entity).revelationfix$setBaseAttributeMode(false);
@@ -579,7 +579,7 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void tickTail(CallbackInfo ci) {
-        //更新数据
+        //闁哄洤鐡ㄩ弻濠囧极閻楀牆绁?
         this.revelaionfix$apollyonEC().tickTail();
     }
 
@@ -615,7 +615,7 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void tickHead(CallbackInfo ci) {
-        //更新数据
+        //闁哄洤鐡ㄩ弻濠囧极閻楀牆绁?
         this.revelaionfix$apollyonEC().tickHead();
     }
 
@@ -629,6 +629,13 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
     @Redirect(method = "hurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/damagesource/DamageSource;is(Lnet/minecraft/resources/ResourceKey;)Z", ordinal = 0))
     private boolean hurtRedirect1(DamageSource instance, ResourceKey<DamageType> p_276108_) {
         return instance.is(p_276108_) && !(instance.getEntity() instanceof Player);
+    }
+    @Override
+    public CompoundTag getPersistentData() {
+        if (this.revelationfix$asApollyonHelper().allTitlesApostle_1_20_1$isApollyon()) {
+            return new CompoundTag();
+        }
+        return super.getPersistentData();
     }
 
     @Inject(method = "hurt", at = @At("RETURN"), cancellable = true)
@@ -657,7 +664,7 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
         if (abilityHelper.allTitlesApostle_1_20_1$isApollyon() && this.isInNether()) {
             if (!this.isSpellcasting())
                 if (abilityHelper.allTitleApostle$getTitleNumber() == 12 || this.isDoomNow()) {
-                    //下界亚不施法时候无敌只有 万众or末终
+                    //濞戞挸顑囬弲顐ｇ濮橆偆鐟濋柡鍌濆Г绾爼寮捄琛″亾濞嗘劖锟ラ柡浣歌嫰瑜把囧嫉?濞戞挸娲ｇ槐鐞絩闁哄牜鍋嗙划?
                     cir.setReturnValue(false);
                 }
         }
@@ -727,7 +734,7 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
         }
         if (revelationfix$asApollyonHelper().allTitlesApostle_1_20_1$isApollyon()) {
 
-            //禁止亚波伦杀完玩家后消失
+            //缂佸倷鐒﹂娑欑濮橆厼鐨惧ù纭烽檮濞煎啰鈧懓鐬肩敮铏光偓纭呮硾閹鈽夐崼婵勪杭
             this.killedPlayer = false;
             this.lastKilledPlayer = 200;
             if (level.isClientSide) {
@@ -806,15 +813,14 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
                 double d0 = pTarget.getX() - this.getX();
                 double d1 = pTarget.getY(0.5) - this.getY(0.5);
                 double d2 = pTarget.getZ() - this.getZ();
-                //下界末终第一发 加速箭矢
-                float speed = 3.2F * 2.8F;
+                //濞戞挸顑囬弲顐﹀嫉椤愩倗鐭掔紒妤婂厸缁旀挳宕?闁告梻濞€閳ь剛鍠撻鍕儗?                float speed = 3.2F * 2.8F;
                 float accuracy = 1.0F;
                 abstractarrowentity.shoot(d0, d1, d2, speed, accuracy);
                 this.playSound((SoundEvent) ModSounds.APOSTLE_SHOOT.get(), 1.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
                 this.level.addFreshEntity(abstractarrowentity);
             }
             */
-            //下界末终三发 散射箭矢
+            //濞戞挸顑囬弲顐﹀嫉椤愩倗鐭掑☉鎾愁槸瑜?闁轰緤绲介惃鐘电不椤撶姷鍘?
             for (int j = 0; j < 3; j++) {
                 AbstractArrow abstractarrowentity = this.getArrow(itemstack, pDistanceFactor * (float) AttributesConfig.ApostleBowDamage.get());
                 if (this.getMainHandItem().getItem() instanceof BowOfRevelationItem) {
@@ -898,7 +904,7 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
 
     @Override
     public float revelaionfix$getApollyonHealth() {
-        return this.entityData.get(PIHOPJUBVLOBWXLJBSFVELGVBLEJCWB);
+        return this.getTheData(this.revelationfix$asApostle());
     }
 
     @Override
@@ -907,7 +913,7 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
         ApollyonExpandedContext aec = this.revelaionfix$apollyonEC();
         aec.lastPercent = aec.percent;
         health = Mth.clamp(health, 0.0F, this.getMaxHealth());
-        this.entityData.set(PIHOPJUBVLOBWXLJBSFVELGVBLEJCWB, health);
+        this.setTheData((Apostle) (Object) this, health);
         aec.percent = ApollyonExpandedContext.getPercent(health);
     }
 
@@ -916,6 +922,13 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
         if (((ApollyonAbilityHelper) this).allTitlesApostle_1_20_1$isApollyon() && isInNether()) {
             return revelaionfix$getApollyonHealth();
         } else return super.getHealth();
+    }
+
+    private float getTheData(Apostle apostle) {
+        return 0.0F;
+    }
+
+    private void setTheData(Apostle apostle, float data) {
     }
 
     @Override
@@ -939,7 +952,7 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
                     health = delta + currentHealth;
                 }
                 revelaionfix$setApollyonHealth(health);
-                //无敌帧
+                //闁哄啰濮甸弲顐ゆ暜?
                 if (delta < 0.0F) {
                     this.revelaionfix$setHitCooldown(AttackDamageChangeHandler.vanillaLimitTime);
                     helper.allTitlesApostle_1_20_1$setHitCooldown(AttackDamageChangeHandler.vanillaLimitTime);

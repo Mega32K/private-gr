@@ -45,9 +45,7 @@ public class GoetyClassNodeProcessor implements IClassProcessor, Opcodes {
                 VarInsnNode store = storeOpt.get();
                 int indexOfStore = methodNode.instructions.indexOf(store);
                 InsnList insnList = new InsnList();
-                //鍔犺浇鏂规硶鍙傛暟锛屽師鍊硷紝spell stat field骞跺啓鍏?鍘熸娉曟湳灞炴€?                //鍏? node
                 addSpellStatInsnNodes(insnList, store.var, enum_);
-                //鎻掑叆鍒扮涓€涓娇鐢▁_load_<var>涔嬪墠
                 methodNode.instructions.forEach(asn -> {
                     if (asn instanceof VarInsnNode varInsnNode && varInsnNode.getOpcode() == enum_.loadOpcode && varInsnNode.var == store.var) {
                         if (methodNode.instructions.indexOf(varInsnNode) > indexOfStore) {
@@ -108,16 +106,16 @@ public class GoetyClassNodeProcessor implements IClassProcessor, Opcodes {
     }
 
     public static void addSpellStatInsnNodes(InsnList insnList, int theXStoreNodeVar, SpellStatField statField) {
-        //aload_0 鍔犺浇this ISPELL
+        //aload_0 this ISPELL
         insnList.add(new VarInsnNode(Opcodes.ALOAD, 0));
-        //aload_1 鍔犺浇ServerLevel
+        //aload_1 ServerLevel
         insnList.add(new VarInsnNode(ALOAD, 1));
-        //aload_2 鍔犺浇LivingEntity
+        //aload_2 LivingEntity
         insnList.add(new VarInsnNode(ALOAD, 2));
-        //aload_3 鍔犺浇ItemStack
+        //aload_3 ItemStack
         insnList.add(new VarInsnNode(ALOAD, 3));
         insnList.add(new VarInsnNode(statField.loadOpcode, theXStoreNodeVar));
-        //鍔犺浇SpellStatField
+        //SpellStatField
         insnList.add(new FieldInsnNode(Opcodes.GETSTATIC, SPELL_STAT_FIELD_CLASS, statField.name(), "Lcom/mega/revelationfix/util/asm/GoetyClassNodeProcessor$SpellStatField;"));
 
         insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, RevelationFixMixinPlugin.EVENT_UTIL_CLASS, statField.getSpellModifyMethodName(), statField.getSpellModifyMethodDesc(), false));
@@ -181,7 +179,6 @@ public class GoetyClassNodeProcessor implements IClassProcessor, Opcodes {
                 classNode.methods.forEach(methodNode -> {
                     methodNode.instructions.forEach(abstractInsnNode -> {
                         if (abstractInsnNode instanceof MethodInsnNode min) {
-                            //鏀硅皟鐢紝璁╁帆鏈弽搴斿彴鐨勪慨鏀硅搴旂敤
                             if (min.owner.equals(ISPELL_CLASS)) {
                                 if (min.name.equals("SpellResult") && min.desc.equals("(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lcom/Polarice3/Goety/common/magic/SpellStat;)V")) {
                                     modified.set(true);

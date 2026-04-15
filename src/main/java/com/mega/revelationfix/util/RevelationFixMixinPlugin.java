@@ -67,12 +67,11 @@ public class RevelationFixMixinPlugin extends ApplyCheckMixinConfigPlugin {
         toRemovedMixins.add("z1gned/goetyrevelation/mixin/BarricadeSpellMixin");
         toRemovedMixins.add("z1gned/goetyrevelation/mixin/BowItemMixin");
         toRemovedMixins.add("z1gned/goetyrevelation/mixin/FireBlastTrapMixin");
-        //BC鍏煎
         toRemovedMixins.add("z1gned/goetyrevelation/mixin/LivingEntityRendererMixin");
         toRemovedMixins.add("z1gned/goetyrevelation/mixin/ApostleModelMixin");
         toRemovedMixins.add("com/elfmcys/yesstevemodel/mixin/client/InventoryScreenMixin");
-        toRemovedMixins.add("me/lihe/ornaments/moonstoneoutstandingsins/mixin/ApollyonBypassMixin");
-        toRemovedMixins.add("me/lihe/ornaments/moonstoneoutstandingsins/mixin/BypassLimitMixin");
+        //toRemovedMixins.add("me/lihe/ornaments/moonstoneoutstandingsins/mixin/ApollyonBypassMixin");
+        //toRemovedMixins.add("me/lihe/ornaments/moonstoneoutstandingsins/mixin/BypassLimitMixin");
 
         //toTransformClasses.add(LIVING_ENTITY_CLASS);
         if (USE_FIX_MIXIN)
