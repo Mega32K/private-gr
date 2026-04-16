@@ -4,8 +4,10 @@ import com.Polarice3.Goety.api.items.ISoulRepair;
 import com.Polarice3.Goety.common.effects.GoetyEffects;
 import com.Polarice3.Goety.common.entities.projectiles.DeathArrow;
 import com.Polarice3.Goety.init.ModSounds;
+import com.mega.endinglib.api.capability.ELCapabilityManager;
 import com.mega.endinglib.api.client.text.TextColorUtils;
 import com.mega.revelationfix.common.apollyon.common.BypassInvulArrow;
+import com.mega.revelationfix.proxy.CommonProxy;
 import com.mega.revelationfix.safe.entity.DeathArrowEC;
 import com.mega.revelationfix.util.MUtils;
 import com.mega.revelationfix.util.entity.ATAHelper2;
@@ -32,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
 import z1gned.goetyrevelation.util.ATAHelper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings("deprecation")
@@ -104,6 +107,8 @@ public class BowOfRevelationItem extends BowItem implements ISoulRepair {
 
                             ((DeathArrow) (deathArrow)).setEffectsFromItem(itemStack);
                             deathArrow = customArrow(deathArrow);
+                            //添加一点基本伤害
+                            deathArrow.setBaseDamage(deathArrow.getBaseDamage() + 2);
                             deathArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, f * 3.2F * ((isOdamane || isAscension) ? 2.0F : 1.0F), i2 == 0 ? 1.0F : 5.0F);
 
                             if (isOdamane) {
@@ -135,7 +140,8 @@ public class BowOfRevelationItem extends BowItem implements ISoulRepair {
 
                             int j = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, itemStack);
                             if (j > 0) {
-                                deathArrow.setBaseDamage(deathArrow.getBaseDamage() + (double) j * 0.5D + 0.5D);
+                                //天启弓的力量效果 * 1.25F
+                                deathArrow.setBaseDamage(deathArrow.getBaseDamage() + (double) j * (0.5D + 0.25D) + (0.5D + 0.5D));
                             }
 
                             int k = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, itemStack);
@@ -154,6 +160,7 @@ public class BowOfRevelationItem extends BowItem implements ISoulRepair {
                             level.addFreshEntity(deathArrow);
                             if (player.isShiftKeyDown()) {
                                 ((DeathArrowEC) deathArrow).getWrappedTrailData().setShouldRenderTrail(true);
+                                CommonProxy.getTrailCapOptional(deathArrow).ifPresent(cap -> System.out.println(1));
                                 deathArrow.addTag(BypassInvulArrow.TAG_BYPASS_NAME);
                             }
                             deathArrow.addTag(FORCE_ADD_EFFECT);

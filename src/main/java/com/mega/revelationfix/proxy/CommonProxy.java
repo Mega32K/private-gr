@@ -8,9 +8,11 @@ import com.mega.endinglib.api.capability.ELCapabilityManager;
 import com.mega.endinglib.api.capability.annotation.AutoCapGetter;
 import com.mega.endinglib.api.capability.annotation.AutoCapManager;
 import com.mega.endinglib.api.capability.syncher.CapabilityDataSerializers;
+import com.mega.revelationfix.api.entity.ITrailRendererEntity;
 import com.mega.revelationfix.common.advancement.ModCriteriaTriggers;
 import com.mega.revelationfix.common.capability.entity.GRPlayerCapability;
 import com.mega.revelationfix.common.capability.entity.MegaCapability;
+import com.mega.revelationfix.common.capability.entity.TrailCapability;
 import com.mega.revelationfix.common.compat.SafeClass;
 import com.mega.revelationfix.common.entity.binding.FakeSpellerEntity;
 import com.mega.revelationfix.common.entity.boss.ApostleServant;
@@ -20,6 +22,7 @@ import com.mega.revelationfix.common.init.ModPotions;
 import com.mega.revelationfix.common.odamane.common.TheEndPuzzleItems;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
@@ -39,6 +42,7 @@ import top.theillusivec4.curios.api.SlotTypePreset;
 public class CommonProxy implements ModProxy {
     public static LazyOptional<Capability<MegaCapability>> MEGA_CAPABILITY = LazyOptional.of(() -> ELCapabilityManager.getCapability(MegaCapability.NAME.toString()));
     public static LazyOptional<Capability<GRPlayerCapability>> PLAYER_CAPABILITY = LazyOptional.of(() -> ELCapabilityManager.getCapability(GRPlayerCapability.NAME.toString()));
+    public static LazyOptional<Capability<TrailCapability>> TRAIL_CAPABILITY = LazyOptional.of(() -> ELCapabilityManager.getCapability(TrailCapability.NAME.toString()));
     public CommonProxy(FMLJavaModLoadingContext context) {
         IEventBus modBus = context.getModEventBus();
         modBus.addListener(this::commonSetup);
@@ -51,10 +55,13 @@ public class CommonProxy implements ModProxy {
     public static LazyOptional<GRPlayerCapability> getPlayerCapOptional(Player player) {
         return player.getCapability(PLAYER_CAPABILITY.orElse(ELCapabilityManager.getCapability(GRPlayerCapability.NAME.toString())));
     }
-
     @AutoCapGetter(value = MegaCapability.class)
     public static LazyOptional<MegaCapability> getMegaCapOptional(Apostle apostle) {
         return apostle.getCapability(MEGA_CAPABILITY.orElse(ELCapabilityManager.getCapability(MegaCapability.NAME.toString())));
+    }
+    @AutoCapGetter(value = TrailCapability.class)
+    public static LazyOptional<TrailCapability> getTrailCapOptional(Entity entity) {
+        return entity.getCapability(TRAIL_CAPABILITY.orElse(ELCapabilityManager.getCapability(TrailCapability.NAME.toString())));
     }
     public void buildCreativeTab(BuildCreativeModeTabContentsEvent event) {
         if (SafeClass.isTetraLoaded()) {
@@ -75,6 +82,8 @@ public class CommonProxy implements ModProxy {
         ELCapabilityManager.regsterCapability(GRPlayerCapability::new, new CapabilityToken<GRPlayerCapability>() {
         });
         ELCapabilityManager.regsterCapability(MegaCapability::new, new CapabilityToken<MegaCapability>() {
+        });
+        ELCapabilityManager.regsterCapability(TrailCapability::new, new CapabilityToken<TrailCapability>() {
         });
         CapabilityDataSerializers.registerSerializer(MegaCapability.FLOAT_WRAPPED);
     }

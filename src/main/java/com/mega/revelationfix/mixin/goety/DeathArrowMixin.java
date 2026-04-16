@@ -30,7 +30,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import z1gned.goetyrevelation.util.ApollyonAbilityHelper;
 
 @Mixin(DeathArrow.class)
-public abstract  class DeathArrowMixin extends Arrow implements DeathArrowEC {
+public abstract class DeathArrowMixin extends Arrow implements DeathArrowEC {
 
     @Unique
     public int revelationfix$inGroundTime = 0;

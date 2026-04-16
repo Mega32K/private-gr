@@ -4,11 +4,13 @@ import com.mega.revelationfix.api.entity.ITrailRendererEntity;
 import com.mega.revelationfix.client.renderer.trail.TrailPoint;
 import com.mega.revelationfix.common.network.PacketHandler;
 import com.mega.revelationfix.common.network.s2c.EntityTagsSyncPacket;
+import com.mega.revelationfix.proxy.CommonProxy;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import z1gned.goetyrevelation.ModMain;
 
 import javax.annotation.Nullable;
@@ -55,13 +57,16 @@ public class WrappedTrailData {
     }
 
     public void setShouldRenderTrail(boolean z) {
-        entity.addTag(ModMain.MODID + "_shouldRenderTrail");
-        PacketHandler.sendToAll(new EntityTagsSyncPacket(this.entity.getId(), this.entity.getTags()));
+        CommonProxy.getTrailCapOptional(entity).ifPresent(cap -> {
+            cap.setShouldRender(z);
+        });
     }
 
     public boolean shouldRenderTrail() {
         if (trailRenderer != null && !trailRenderer.shouldRenderWrappedTrail())
             return false;
-        return entity.getTags().contains(ModMain.MODID + "_shouldRenderTrail");
+        MutableBoolean render = new MutableBoolean(false);
+        CommonProxy.getTrailCapOptional(entity).ifPresent(cap -> render.setValue(cap.shouldRender()));
+        return render.getValue();
     }
 }

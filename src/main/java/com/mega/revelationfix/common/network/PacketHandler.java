@@ -61,6 +61,9 @@ public class PacketHandler {
         INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(() -> entity), message);
     }
 
+    public static <MSG> void sendToTrack(Entity entity, MSG message) {
+        INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity), message);
+    }
     public static void playSound(ServerPlayer serverPlayer, SoundEvent soundEvent, SoundSource source, float volume, float s) {
         ServerLevel serverLevel = serverPlayer.serverLevel();
         for (ServerPlayer player : serverLevel.players()) {
