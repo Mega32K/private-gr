@@ -368,7 +368,7 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
                     PlayerTickrateExecutor.disableBaseValueMode((Player) entity);
                 }
         }
-        //闁哄洤鐡ㄩ弻濠傤潰鐠佹娊顎楅柡鍐ㄧ埣濡?
+        // 手动推进死亡计时，避免死亡流程被卡住
         this.setDeathTime(this.getDeathTime() + 1);
         currentDeathTime = this.getDeathTime();
 
@@ -490,7 +490,7 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
                     this.remove(RemovalReason.KILLED);
                     for (Entity entity : level.getEntities(this, new AABB(blockPosition()).inflate(64D), (e) -> e instanceof Player)) {
                         if (!level.isClientSide) {
-                            //閻熸瑱绠戣ぐ鍌炲箣閹邦剚鐨?
+                            // 手动补发击杀触发，并恢复玩家的基础属性模式
                             ServerPlayer serverPlayer = (ServerPlayer) entity;
                             CriteriaTriggers.PLAYER_KILLED_ENTITY.trigger(serverPlayer, this, serverPlayer.damageSources().playerAttack(serverPlayer));
                             ((PlayerInterface) entity).revelationfix$setBaseAttributeMode(false);
@@ -507,7 +507,7 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
     public void remove(@NotNull RemovalReason removalReason) {
         super.remove(removalReason);
         Level level = this.level();
-        if (removalReason == RemovalReason.KILLED || removalReason == RemovalReason.DISCARDED) {
+        if (removalReason.shouldDestroy()) {
             if (!level.isClientSide && isInNether() && revelationfix$asApollyonHelper().allTitlesApostle_1_20_1$isApollyon()) {
                 ChestBlock chest = (ChestBlock) Blocks.CHEST;
                 BlockState blockState = chest.defaultBlockState();
@@ -576,7 +576,7 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void tickTail(CallbackInfo ci) {
-        //闁哄洤鐡ㄩ弻濠囧极閻楀牆绁?
+        // 推进 Apollyon 扩展数据的尾部 Tick 逻辑
         this.revelaionfix$apollyonEC().tickTail();
     }
 
@@ -612,7 +612,7 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void tickHead(CallbackInfo ci) {
-        //闁哄洤鐡ㄩ弻濠囧极閻楀牆绁?
+        // 推进 Apollyon 扩展数据的头部 Tick 逻辑
         this.revelaionfix$apollyonEC().tickHead();
     }
 
@@ -661,7 +661,7 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
         if (abilityHelper.allTitlesApostle_1_20_1$isApollyon() && this.isInNether()) {
             if (!this.isSpellcasting())
                 if (abilityHelper.allTitleApostle$getTitleNumber() == 12 || this.isDoomNow()) {
-                    //濞戞挸顑囬弲顐ｇ濮橆偆鐟濋柡鍌濆Г绾爼寮捄琛″亾濞嗘劖锟ラ柡浣歌嫰瑜把囧嫉?濞戞挸娲ｇ槐鐞絩闁哄牜鍋嗙划?
+                    // 这些阶段的伤害由自定义血量系统接管，这里直接拦截原版 hurt 结果
                     cir.setReturnValue(false);
                 }
         }
@@ -731,7 +731,7 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
         }
         if (revelationfix$asApollyonHelper().allTitlesApostle_1_20_1$isApollyon()) {
 
-            //缂佸倷鐒﹂娑欑濮橆厼鐨惧ù纭烽檮濞煎啰鈧懓鐬肩敮铏光偓纭呮硾閹鈽夐崼婵勪杭
+            // 禁用原版击杀玩家后的强化状态，避免与自定义属性逻辑冲突
             this.killedPlayer = false;
             this.lastKilledPlayer = 200;
             if (level.isClientSide) {
@@ -810,14 +810,14 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
                 double d0 = pTarget.getX() - this.getX();
                 double d1 = pTarget.getY(0.5) - this.getY(0.5);
                 double d2 = pTarget.getZ() - this.getZ();
-                //濞戞挸顑囬弲顐﹀嫉椤愩倗鐭掔紒妤婂厸缁旀挳宕?闁告梻濞€閳ь剛鍠撻鍕儗?                float speed = 3.2F * 2.8F;
+                // 旧版单发参数记录：speed = 3.2F * 2.8F;
                 float accuracy = 1.0F;
                 abstractarrowentity.shoot(d0, d1, d2, speed, accuracy);
                 this.playSound((SoundEvent) ModSounds.APOSTLE_SHOOT.get(), 1.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
                 this.level.addFreshEntity(abstractarrowentity);
             }
             */
-            //濞戞挸顑囬弲顐﹀嫉椤愩倗鐭掑☉鎾愁槸瑜?闁轰緤绲介惃鐘电不椤撶姷鍘?
+            // 改为三连射，最后一箭保持更高速度和精度
             for (int j = 0; j < 3; j++) {
                 AbstractArrow abstractarrowentity = this.getArrow(itemstack, pDistanceFactor * (float) AttributesConfig.ApostleBowDamage.get());
                 if (this.getMainHandItem().getItem() instanceof BowOfRevelationItem) {
@@ -895,11 +895,6 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
     }
 
     @Override
-    public boolean isAlive() {
-        return super.isAlive();
-    }
-
-    @Override
     public float revelaionfix$getApollyonHealth() {
         return this.getTheData(this.revelationfix$asApostle());
     }
@@ -919,6 +914,19 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
         if (((ApollyonAbilityHelper) this).allTitlesApostle_1_20_1$isApollyon() && isInNether()) {
             return revelaionfix$getApollyonHealth();
         } else return super.getHealth();
+    }
+
+    @Override
+    public boolean isAlive() {
+        if (((ApollyonAbilityHelper) this).allTitlesApostle_1_20_1$isApollyon() && isInNether())
+            return !this.isRemoved() && this.getTheData(revelationfix$asApostle()) > 0.0F;
+        return super.isAlive();
+    }
+    @Override
+    public boolean isDeadOrDying() {
+        if (((ApollyonAbilityHelper) this).allTitlesApostle_1_20_1$isApollyon() && isInNether())
+            return this.getTheData(revelationfix$asApostle()) <= 0.0F;
+        return super.isDeadOrDying();
     }
 
     private float getTheData(Apostle apostle) {
@@ -949,7 +957,7 @@ public abstract class ApollyonMixin extends SpellCastingCultist implements Apoll
                     health = delta + currentHealth;
                 }
                 revelaionfix$setApollyonHealth(health);
-                //闁哄啰濮甸弲顐ゆ暜?
+                // 受伤后重新设置受击冷却
                 if (delta < 0.0F) {
                     this.revelaionfix$setHitCooldown(AttackDamageChangeHandler.vanillaLimitTime);
                     helper.allTitlesApostle_1_20_1$setHitCooldown(AttackDamageChangeHandler.vanillaLimitTime);

@@ -334,8 +334,8 @@ public class GoetyClassNodeProcessor implements IClassProcessor, Opcodes {
     }
 
     /**
-     * 鏋氫妇鏉ヨ嚜绫粄@link com.Polarice3.Goety.common.magic.SpellStat}<br>
-     * 瀵瑰簲鎵€鏈夌殑SpellStat绫荤殑瀛楁(灞炴€?
+     * 枚举来自类 {@link com.Polarice3.Goety.common.magic.SpellStat}<br>
+     * 对应 SpellStat 中所有会被处理的字段（属性）
      */
     public enum SpellStatField {
         //POTENCY("potency", "I", "getPotency", "()I", ISTORE, ILOAD, "POTENCY"),

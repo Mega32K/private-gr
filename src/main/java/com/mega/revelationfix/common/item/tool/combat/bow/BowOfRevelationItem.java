@@ -4,7 +4,6 @@ import com.Polarice3.Goety.api.items.ISoulRepair;
 import com.Polarice3.Goety.common.effects.GoetyEffects;
 import com.Polarice3.Goety.common.entities.projectiles.DeathArrow;
 import com.Polarice3.Goety.init.ModSounds;
-import com.mega.endinglib.api.capability.ELCapabilityManager;
 import com.mega.endinglib.api.client.text.TextColorUtils;
 import com.mega.revelationfix.common.apollyon.common.BypassInvulArrow;
 import com.mega.revelationfix.proxy.CommonProxy;
@@ -16,6 +15,8 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -34,7 +35,6 @@ import org.jetbrains.annotations.Nullable;
 import z1gned.goetyrevelation.util.ATAHelper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings("deprecation")
@@ -80,6 +80,7 @@ public class BowOfRevelationItem extends BowItem implements ISoulRepair {
         if (livingEntity instanceof Player player) {
             boolean flag = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, itemStack) > 0;
             ItemStack itemstack = player.getProjectile(itemStack);
+            if (itemstack.isEmpty()) itemstack = new ItemStack(Items.ARROW);
 
             int i = this.getUseDuration(itemStack) - timeLeft;
             i = net.minecraftforge.event.ForgeEventFactory.onArrowLoose(itemStack, level, player, i, !itemstack.isEmpty() || flag);
@@ -198,5 +199,16 @@ public class BowOfRevelationItem extends BowItem implements ISoulRepair {
         p_41423_.add(Component.translatable("item.goety_revelation.bow_of_revelation.desc1").withStyle(TextColorUtils.MIDDLE, ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
         p_41423_.add(Component.translatable("item.goety_revelation.bow_of_revelation.desc2").withStyle(TextColorUtils.MIDDLE, ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
         super.appendHoverText(p_41421_, p_41422_, p_41423_, p_41424_);
+    }
+
+    @Override
+    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, Player player, @NotNull InteractionHand hand) {
+        ItemStack itemstack = player.getItemInHand(hand);
+
+        InteractionResultHolder<ItemStack> ret = net.minecraftforge.event.ForgeEventFactory.onArrowNock(itemstack, level, player, hand, true);
+        if (ret != null) return ret;
+
+        player.startUsingItem(hand);
+        return InteractionResultHolder.consume(itemstack);
     }
 }
